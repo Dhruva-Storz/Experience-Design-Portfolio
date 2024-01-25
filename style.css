@@ -1,0 +1,612 @@
+* {
+    box-sizing: border-box;
+}
+
+
+/* Set the global font family and background color */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    height: stretch;
+    font-family: Futura, "Trebuchet MS", Arial, sans-serif; /* Futura font with fallbacks */
+    background-color: rgb(0, 0, 0);
+    color: white;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    overflow-y:hidden;
+}
+
+#container {
+    width: 100%;
+    height: 100%;
+    scrollbar-width: none; /* For Firefox */
+    overflow-y: auto;
+
+}
+
+
+#container::-webkit-scrollbar {
+    display: none; /* Hide scrollbars in WebKit browsers */
+}
+
+#titlePage {
+    display: block;
+    /* justify-content: center;
+    align-items: center; */
+
+}
+
+.title {
+    text-align: center;
+    width: 70%;
+}
+
+#titlePage .title h1 {
+    margin-bottom: 100px;
+    font-size: 84px;
+}
+
+/* Specific margin for h2 in the title div */
+#titlePage .title h2 {
+    margin-bottom: 50px;
+    font-size: 38px;
+}
+  
+.section {
+    width: 100vw;
+    min-height: 100vh;
+    /* Additional styling */
+    overflow-y:auto;
+}
+
+.section-main {
+    position: relative; /* Set to relative for absolute positioning of children */
+    height:100vh;
+    width:100vw;
+}
+
+.section-header {
+    position: absolute;
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust position to truly center */
+    text-align: center;
+    width: 70%;
+    font-weight: 100;
+    font-size: 65px;
+}
+
+.spacer {
+    position: relative;
+    width: 100vw;
+    height:40vh;
+    z-index: 50;
+}
+
+/* Font size for h1 */
+h1 {
+    font-size: 72px; /* Set font size for h1 globally */
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom:0.5rem;
+    font-weight:800;
+    line-height: 1.7em;
+}
+
+h2 {
+    font-size: 40px; /* Set font size for h2 globally */
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    margin-bottom:15px;
+    font-weight:500;
+}
+
+
+/* Font size for paragraph */
+p {
+    font-size: 16px; /* Set font size for paragraphs */
+}
+
+
+
+.background-description {
+    text-align: center;
+    padding-bottom: 150px;
+    font-size: 12px;
+}
+
+
+
+
+
+
+
+#verticalNav {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 99;
+    padding: 15px; /* Add 15px padding around the entire navbar */
+    background-color: rgba(255, 255, 255, 0); /* Optional: Add background color */
+}
+
+.nav-circle, .nav-circle:first-child {
+    /* Common styles for circles and triangle */
+    position: relative;
+    cursor: pointer;
+    
+}
+
+.nav-circle::before, .nav-circle:first-child::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30px; /* Adjust size to create the desired outer circle size */
+    height: 30px; /* Adjust size to create the desired outer circle size */
+    border-radius: 50%;
+    border: 2px solid transparent; /* Set border color to transparent initially */
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.nav-circle:first-child::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -30%);
+    width: 30px; /* Size of the outer circle */
+    height: 30px; /* Size of the outer circle */
+    border-radius: 50%;
+    border: 2px solid transparent; /* Initially transparent, visible on hover */
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+    /* Adjust the following properties for precise centering */
+    transform-origin: center;
+}
+
+
+.nav-circle:hover::before, .nav-circle:first-child:hover::before {
+    border-color: white; /* Change border color on hover */
+    opacity: 1;
+    transition: all 0.2s ease-in;
+
+}
+
+
+
+
+
+.nav-circle {
+    position: relative;
+    width: 10px; /* Half of the original 20px */
+    height: 10px; /* Half of the original 20px */
+    background-color: #ffffff;
+    border-radius: 50%;
+    margin-bottom: 40px; /* 1.5 times the height */
+    cursor: pointer;
+    padding: 2.5px; /* Adjust padding to maintain proportions */
+    box-sizing: border-box;
+
+}
+
+.nav-circle:first-child {
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent; /* Half of the original 10px */
+    border-right: 5px solid transparent; /* Half of the original 10px */
+    border-bottom: 10px solid #ffffff; /* Half of the original 20px */
+    position: relative;
+
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    margin-bottom: 40px; /* Adjust as needed */
+}
+
+/* Styles for the span (label) associated with the triangle */
+.nav-circle:first-child span {
+    right: 100%;
+    margin-right: 25px; /* Adjust based on triangle size */
+    top: 50%; /* Center align vertically */
+    transform: translateY(-30%); /* Adjust the percentage for precise vertical alignment */
+}
+
+
+.nav-circle span {
+    position: absolute;
+    right: 100%; /* Move text to the left of the circle */
+    margin-right: 20px; /* Add some space between text and circle */
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: transparent;
+    color: white;
+    padding: 5px;
+    border-radius: 5px;
+    white-space: nowrap;
+    letter-spacing: 0.08em;
+    opacity: 0;
+    transition: all 0.3s ease-out;
+}
+
+.nav-circle:hover span {
+    display: block;
+    opacity:1;
+    transition: all 0.2s ease-in;
+}
+
+
+
+
+
+
+
+.text-box {
+    position: relative;
+    top: 0;
+    left: 0;
+    font-family: Arial, sans-serif;
+    padding: 60px; /* Increased padding around the text */
+    background-color: rgba(0, 0, 0, 0); /* Background color changed to black */
+    color: white; /* Text color set to white */
+    width:30%;
+}
+
+.section h3 {
+    /* Styles for h3 (Design by) */
+    margin-bottom: 0px; /* Reduced space between h3 and h2 */
+    font-size: 4em; /* Increased font size */
+    /* Other styles */
+    margin-top:0;
+    font-weight:400;
+    margin-left: 6px;
+    letter-spacing: 0.05em;
+    
+}
+
+.section h2 {
+    /* Styles for h2 (Section title) */
+    margin-top: 0; /* Reduced space between h3 and h2 */
+    font-size: 8em; /* Increased font size */
+    /* Other styles */
+    font-weight:500;
+    letter-spacing: 0.025em;
+}
+
+.section p {
+    /* Styles for paragraph (Description) */
+    font-size: 1.5em; /* Increased font size */
+    /* Other text styles */
+    margin-left: 5px;
+}
+
+
+.section {
+    position: relative;
+    /* ... other styles ... */
+    background-color: transparent; 
+    min-height: 100vh;
+    z-index: 1;
+
+}
+
+.text-box {
+    padding: 60px;
+}
+
+.text-box {
+    width: 500px; /* Adjust as needed */
+    /* Other styling like padding, margin, etc. */
+    height: 100vh;
+}
+
+.text-box p {
+    width: 100%; /* Take full width of text-box */
+    /* Additional styling */
+    width: 800px;
+}
+
+
+
+.parallax-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    
+    height: 100vh;
+    z-index: 0; /* Behind the content but fixed in viewport */
+    opacity: 0; /* Start with boxes invisible */
+    transition: opacity 0.5s ease-in-out;
+    /* Add additional styles (e.g., border, shadow) as needed */
+}
+
+
+/* ... Other styles ... */
+
+
+
+/* Styling for the image grid */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(30%, 1fr)); /* Adjust '150px' to your preferred minimum width */
+    grid-gap: 10px; /* Space between images */
+    padding: 20px; /* Padding around the grid */
+    margin-top: 20px; /* Space above the grid, adjust as needed */
+    margin: 0 auto;   /* Center the grid horizontally within its parent container */
+    width: 30%;       /* Set width to 70% of the parent container */
+    /* height: 100vh; */
+    min-height:100vh;
+}
+
+
+.image-grid img {
+    width: 100%; /* Make images take up the full grid cell width */
+    height: auto; /* Keep image aspect ratio */
+    object-fit: cover; /* Ensure images cover the grid area */
+}
+
+
+#loadingScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    transition: opacity 1s ease-out, visibility 1s ease-out;
+    opacity: 1;
+    visibility: visible;
+}
+
+#loadingScreen p {
+    color: white;
+    font-size: 2em; /* Large text size */
+    text-align: center;
+}
+
+
+#imageOverlay {
+    position: fixed;
+    left: 50%;
+    right: 50%;
+    top: 5%;
+    min-width: 50%;
+    height: 90%;
+    background-color: rgba(255, 255, 255, 0.05); /* Semi-transparent black */
+    backdrop-filter: blur(16px);
+    border-radius: 15px;
+    box-shadow: 0 4px 12px #000000;
+    z-index: 1000; /* Ensure it's on top */
+
+}
+
+#imageOverlay {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black */
+    backdrop-filter: blur(16px);
+    border-radius: 15px;
+    box-shadow: 0 4px 12px #000000;
+    display: flex; /* Use flexbox */
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    z-index: 1000; /* Ensure it's on top */
+}
+
+
+.overlay-content {
+    position: relative;
+    height: 90%;
+    margin-top: 1%;
+    /* transform: translateY(-50%); */
+    text-align: center;
+    color: white;
+    opacity: 1;
+}
+
+#closeOverlay {
+    position: absolute;
+    top: 0px;
+    right: 20px;
+    font-size: 100px;
+    opacity: 1;
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+    z-index: 1001
+
+}
+
+#overlayImage {
+    max-width: 80%;
+    /* max-height: 80%; */
+    height: 100%;
+    opacity: 1;
+
+}
+
+
+
+
+
+.content-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 100px; /* Space between each row */
+    width: 90%; /* Set the row width to 50% of the parent container */
+    margin-left: auto; /* Center the row */
+    margin-right: auto; /* Center the row */
+}
+
+.content-row img {
+    width:48%; /* Make images take up the full width of their container */
+    height: auto;
+    object-fit: cover; /* Adjust as needed */
+}
+
+.text-column {
+    width: 49%; /* Text column takes up the remaining space */
+    padding: 0 20px; /* Add some padding */
+    transform: translate(-7px, -7px);
+
+}
+
+
+
+
+
+
+.text-column h3{
+    font-size: 40px;
+    transform: translateX(-2px);
+}
+
+.text-column p{
+    font-size: 16px;
+    line-height: 1.2em;
+}
+
+
+
+.column-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%; /* Full width of the parent container */
+    margin: 0 auto; /* Auto margin for horizontal centering */
+    padding-top: 5%;
+}
+
+.image-text-column {
+    width: 48%; /* Each column takes up roughly half the width of the container */
+    display: flex;
+    flex-direction: column; /* Stack image and text vertically */
+    padding-bottom: 100px;
+}
+
+.image-text-column img {
+    width: 100%; /* Image takes up full width of the column */
+    height: auto;
+    object-fit: cover;
+    padding-bottom: 20px;
+}
+
+.column-container h3{
+    font-size: 40px;
+    transform: translateX(-2px);
+    padding-bottom: 5px;
+}
+
+.column-container p{
+    font-size: 16px;
+    line-height: 1.2em;
+}
+
+
+
+.column-text {
+    width: 100%;
+}
+
+.background-container {
+    width: 60vw; /* 50% of the viewport width */
+    margin: 0 auto; /* Center the container */
+    background-color: #00000001; /* Example background color */
+    backdrop-filter: blur(12px);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px #000000;
+
+
+    padding: 150px; /* Optional padding around the content */
+    /* Other styles as needed */
+    padding-top: 200px;
+}
+
+
+#content-row-1 {
+    padding-top: 100px;
+}
+
+#content-row-2 {
+        /* Add any specific styles for content-row if needed */
+
+}
+
+#content-row-1 .grid-image {
+    width: 30%;
+    display: block;
+    margin-left: auto;
+    padding-bottom: 80px;
+    margin-left: 20%;
+}
+
+#content-row-2 .grid-image {
+    width: 20%;
+    display: block;
+    margin-left: auto;
+    padding-bottom: 80px;
+    margin-left: 30%;
+
+}
+
+#content-row-1 .text-column, #content-row-2 .text-column {
+    width: 40%;
+    display: block;
+    margin-right: auto;
+    margin-left: 20px;
+}
+
+#solution {
+    width: 80%;
+    margin: 0 auto;
+    padding-bottom: 100px;
+    padding-top: 60px;
+}
+
+#solution .grid-image {
+    width: 100%;
+}
+
+#blending-final {
+    width: 90%;
+    display: block;
+    margin: 0 auto;
+}
+
+#title-container {
+    width:100vw;
+    height:100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#intro {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+}
+
+#intro-background {
+    padding:10%;
+    width: 70vw;
+    height:70vh;
+}
+
+#intro h3 {
+    padding-bottom: 60px;
+}
