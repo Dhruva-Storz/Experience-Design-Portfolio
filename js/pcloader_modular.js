@@ -102,7 +102,7 @@ export function initializePointCloud(containerId, supercontainerId, imageSrcPath
 				animateDistance(0.05);
 			}
 		});
-	}, { threshold: 0.2 });
+	}, { threshold: 0.1 });
 	
 	
 	
