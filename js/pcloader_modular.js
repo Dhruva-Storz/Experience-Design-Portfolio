@@ -340,7 +340,11 @@ export function initializePointCloud(containerId, supercontainerId, imageSrcPath
 			fragmentShader: this.get( 'particle-fs' )
 		} );
         // load point cloud
-        loadPC();
+		img.onload = function() {
+			imgSrc.onload = function() {
+        		loadPC();
+			}
+		}
 
 	} );
 	
