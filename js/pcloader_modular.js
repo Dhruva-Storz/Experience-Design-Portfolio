@@ -1,18 +1,18 @@
 let currentPointCloud = null;
 let renderer, scene, camera;
 
-export function initializePointCloud(containerId, supercontainerId, imageSrcPath, depthSrcPath, onLoadedCallback, nDistanceMin=35, nDistanceMax=60, nDistanceInit=500) {
+export function initializePointCloud(containerId, supercontainerId, imgSrc, img, onLoadedCallback, nDistanceMin=35, nDistanceMax=60, nDistanceInit=500) {
     // Place the entire logic here, modifying it to use the parameters:
     // containerId, imageSrcPath, and depthSrcPath
 
     var container = document.getElementById(containerId);
 	var supercontainer = document.getElementById(supercontainerId)
-    var imgSrc = new Image();
-    var img = new Image();
+    // var imgSrc = new Image();
+    // var img = new Image();
 
-    // Set the source paths
-    img.src = depthSrcPath;
-    imgSrc.src = imageSrcPath;
+    // // Set the source paths
+    // img.src = depthSrcPath;
+    // imgSrc.src = imageSrcPath;
 	// console.log(imageSrcPath)
 
 	var settings = {
@@ -221,27 +221,35 @@ export function initializePointCloud(containerId, supercontainerId, imageSrcPath
     sL.add('particle-vs', 'shaders/particle-vs.glsl');
     sL.add('particle-fs', 'shaders/particle-fs.glsl');
 
-    return new Promise((resolve, reject) => {
-        sL.onLoaded(function() {
-            material = new THREE.ShaderMaterial( {
-				attributes: {
-					customColor: { type: 'c', value: null }
-				},
-				uniforms: {
-					size: { type: 'f', value: 1 },
-					displacement: { type: 'f', value: 0 }
-				},
-				vertexShader: this.get( 'particle-vs' ),
-				fragmentShader: this.get( 'particle-fs' )
-			} );
+	// img.onload = function() {
 
-            // Resolve the promise with the loaded point cloud
-            resolve(loadPC());
-        });
+	// 	imgSrc.onload = function() {
 
-        sL.load();
-    });
-}
+
+			return new Promise((resolve, reject) => {
+				sL.onLoaded(function() {
+					material = new THREE.ShaderMaterial( {
+						attributes: {
+							customColor: { type: 'c', value: null }
+						},
+						uniforms: {
+							size: { type: 'f', value: 1 },
+							displacement: { type: 'f', value: 0 }
+						},
+						vertexShader: this.get( 'particle-vs' ),
+						fragmentShader: this.get( 'particle-fs' )
+					} );
+
+					// Resolve the promise with the loaded point cloud
+					resolve(loadPC());
+				});
+
+				sL.load();
+			});
+
+		}
+// 	}
+// }
 
 
 // return new Promise((resolve, reject) => {

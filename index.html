@@ -621,8 +621,16 @@
 
     for (const sectionId in sectionImages) {
         const { image, depth } = sectionImages[sectionId];
+
+        var imgSrc = new Image();
+        var img = new Image();
+
+        // Set the source paths
+        img.src = depth;
+        imgSrc.src = image;
+
         try {
-            const data = await initializePointCloud(sectionId + '-box', sectionId, image, depth, 500);
+            const data = await initializePointCloud(sectionId + '-box', sectionId, imgSrc, img, 500);
             pointClouds[sectionId] = data.pointCloud;
             pointCloudData[sectionId] = { minZ: data.minZ, maxZ: data.maxZ, offset: data.offset, adjustment: data.adjustment };
             loadedPointClouds++;
@@ -850,7 +858,7 @@ let observer = new IntersectionObserver((entries) => {
             }, 500); // This timeout duration should match the fade-out transition time
             setTimeout(() => {
                 renderer.domElement.style.opacity = '1';
-            }, 1000);
+            }, 700);
 
 
         }
