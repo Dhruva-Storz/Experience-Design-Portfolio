@@ -322,7 +322,7 @@ p {
     
     height: 100vh;
     z-index: 0; /* Behind the content but fixed in viewport */
-    opacity: 0; /* Start with boxes invisible */
+    opacity: 1; /* Start with boxes invisible */
     transition: opacity 0.5s ease-in-out;
     /* Add additional styles (e.g., border, shadow) as needed */
 }
@@ -526,7 +526,7 @@ p {
 .background-container {
     width: 60vw; /* 50% of the viewport width */
     margin: 0 auto; /* Center the container */
-    background-color: #00000001; /* Example background color */
+    background-color: #00000078; /* Example background color */
     backdrop-filter: blur(12px);
     border-radius: 8px;
     box-shadow: 0 4px 12px #000000;

@@ -13,6 +13,7 @@ export function initializePointCloud(containerId, supercontainerId, imageSrcPath
     // Set the source paths
     img.src = depthSrcPath;
     imgSrc.src = imageSrcPath;
+	// console.log(imageSrcPath)
 
 	var settings = {
 		focalDistance: 10,
@@ -35,21 +36,21 @@ export function initializePointCloud(containerId, supercontainerId, imageSrcPath
 
 
 
-	scene = new THREE.Scene();
+	// scene = new THREE.Scene();
 
-	camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, .1, 1000 );
-	camera.target = new THREE.Vector3( 0, 0, 0 );
-	camera.position.y = 500;
-	scene.add( camera );
+	// camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, .1, 1000 );
+	// camera.target = new THREE.Vector3( 0, 0, 0 );
+	// camera.position.y = 500;
+	// scene.add( camera );
 
-	renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
-	renderer.setClearColor( 0, 0 );
-	renderer.setSize( window.innerWidth, window.innerHeight );
-	renderer.sortObjects = true;
+	// renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+	// renderer.setClearColor( 0, 0 );
+	// renderer.setSize( window.innerWidth, window.innerHeight );
+	// renderer.sortObjects = true;
 
-	container.appendChild( renderer.domElement );
+	// container.appendChild( renderer.domElement );
 
-	window.addEventListener( 'resize', onResize );
+	// window.addEventListener( 'resize', onResize );
 	
 	// supercontainer.addEventListener( 'mousewheel', onContainerMouseWheel, false );
 	// supercontainer.addEventListener( 'DOMMouseScroll', onContainerMouseWheel, false); 
@@ -58,113 +59,11 @@ export function initializePointCloud(containerId, supercontainerId, imageSrcPath
 
 	// const nDistanceMin =  35; // Minimum value of nDistance
 	// const nDistanceMax = 60; // Maximum value of nDistance
-	let animating = false;
-	let isIntersecting = false; // Track the intersection status
 
-	function animateDistance(scale = 0.05) {
-		if (animating) {
-			return;
-		}
-		animating = true;
-	
-		function step() {
-			const targetValue = isIntersecting ? nDistanceMin : nDistanceMax;
-			const delta = targetValue > nDistance ? scale : -scale;
-	
-			nDistance += delta;
-			nDistance = Math.max(Math.min(nDistance, nDistanceMax), nDistanceMin); // Clamp value within range
-	
-	
-			// Update your Three.js scene or camera distance here
-	
-			// Continue the animation if the target is not reached
-			if ((delta > 0 && nDistance < nDistanceMax) || (delta < 0 && nDistance > nDistanceMin)) {
-				requestAnimationFrame(step);
-			} else {
-				animating = false;
-			}
-		}
-	
-		step();
-	}
-	
-	
-	
-
-	let observer = new IntersectionObserver((entries) => {
-		entries.forEach(entry => {
-			console.log('Intersection changed for', entry.target.id, ':', entry.isIntersecting);
-			const wasIntersecting = isIntersecting;
-			isIntersecting = entry.isIntersecting;
-	
-			if (isIntersecting !== wasIntersecting && !animating) {
-				console.log('Triggering animation due to intersection change');
-				animateDistance(0.05);
-			}
-		});
-	}, { threshold: 0.1 });
-	
-	
-	
-	
-	observer.observe(supercontainer);
-
-
-	function onResize() {
-
-		var w = container.clientWidth,
-			h = container.clientHeight;
-
-		renderer.setSize( w, h );
-
-		camera.aspect = w / h;
-		camera.updateProjectionMatrix();
-
-	}
-
-	function onContainerMouseWheel( event ) {
-		
-		event = event ? event : window.event;
-		//nFov = fov - ( event.detail ? event.detail * -5 : event.wheelDelta / 8 );
-		nDistance = nDistance + ( event.detail ? event.detail * -5 : event.wheelDelta / 100 );
-
-	}
 
 	
 
-	function render() {
-
-		requestAnimationFrame( render );
-
-		// if( nDistance < camera.near ) nDistance = camera.near;
-
-		lon += ( nLon - lon ) * .1;
-		lat += ( nLat - lat ) * .1;
-		fov += ( nFov - fov ) * .1; 
-		distance += ( nDistance - distance ) * .1; 
-		displacement += ( nDisplacement - displacement ) * .1; 
-
-		camera.fov = fov;
-		camera.updateProjectionMatrix();
-
-		if( meshPoint ) {
-			meshPoint.scale.z = adjustment * displacement;
-			meshPoint.visible = 1;
-		}
-
-		lat = Math.max( - 85, Math.min( 85, lat ) );
-		var phi = ( 90 - lat ) * Math.PI / 180;
-		var theta = lon * Math.PI / 180;
-
-		camera.position.x = distance * Math.sin( phi ) * Math.cos( theta );
-		camera.position.y = distance * Math.cos( phi );
-		camera.position.z = distance * Math.sin( phi ) * Math.sin( theta );
-
-		camera.lookAt( camera.target );
-
-		renderer.render( scene, camera );
-
-	}
+	
 
 	function loadPC() {
 
@@ -292,68 +191,71 @@ export function initializePointCloud(containerId, supercontainerId, imageSrcPath
 				var tex = new THREE.Texture( imgSrc );
 				tex.needsUpdate = true;
 
-				meshPoint = new THREE.ParticleSystem( geometry, material );
-				meshPoint.scale.set( adjustment, adjustment, adjustment );
+				// Create the point cloud
+				meshPoint = new THREE.ParticleSystem(geometry, material);
+				meshPoint.scale.set(adjustment, adjustment, adjustment);
 				meshPoint.frustumCulled = false;
-				scene.add( meshPoint );
-				
-				nDistance = parseFloat( focalDistance ) + offset * adjustment;
-				nFov = 1 * Math.atan2( .5 * adjustment * near, focalDistance ) * 180 / Math.PI;
+
+				// Set initial values
+				nDistance = parseFloat(settings.focalDistance) + offset * adjustment;
+				nFov = 1 * Math.atan2(.5 * adjustment * near, settings.focalDistance) * 180 / Math.PI;
 				material.uniforms.size.value = settings.pointSize * nDistance;
 				nDisplacement = 1;
 
-				camera.near = .001;
-				camera.far = ( far + ( maxZ - minZ ) ) * adjustment;
-				camera.updateProjectionMatrix();
-
-				nLat = 0;
-				nLon = 90;
+				// Return the point cloud along with the necessary parameters
+				return {
+					pointCloud: meshPoint,
+					minZ: minZ,
+					maxZ: maxZ,
+					offset: offset,
+					adjustment: adjustment
+				};
 
 		// 	}
-
 		// }
+			}
 
-		if (onLoadedCallback) {
-			//Callback function to let html know when all the pointclouds have been generated so it can drop the loading screen.
-			onLoadedCallback();
-		}
-	
 
-	}
+    // Load shaders and return the point cloud
+    var sL = new ShaderLoader();
+    sL.add('particle-vs', 'shaders/particle-vs.glsl');
+    sL.add('particle-fs', 'shaders/particle-fs.glsl');
 
-    /// Point Cloud Shaders
-	var sL = new ShaderLoader()
-	sL.add( 'particle-vs', 'shaders/particle-vs.glsl' );
-	sL.add( 'particle-fs', 'shaders/particle-fs.glsl' );
-	
-	sL.onLoaded( function() {
+    return new Promise((resolve, reject) => {
+        sL.onLoaded(function() {
+            material = new THREE.ShaderMaterial( {
+				attributes: {
+					customColor: { type: 'c', value: null }
+				},
+				uniforms: {
+					size: { type: 'f', value: 1 },
+					displacement: { type: 'f', value: 0 }
+				},
+				vertexShader: this.get( 'particle-vs' ),
+				fragmentShader: this.get( 'particle-fs' )
+			} );
 
-		material = new THREE.ShaderMaterial( {
-			attributes: {
-				customColor: { type: 'c', value: null }
-			},
-			uniforms: {
-				size: { type: 'f', value: 1 },
-				displacement: { type: 'f', value: 0 }
-			},
-			vertexShader: this.get( 'particle-vs' ),
-			fragmentShader: this.get( 'particle-fs' )
-		} );
-        // load point cloud
-		// img.onload = function() {
-		// 	imgSrc.onload = function() {
-        		loadPC();
-			// }
-		// }
+            // Resolve the promise with the loaded point cloud
+            resolve(loadPC());
+        });
 
-	} );
-	
-	sL.load();
-
-	onResize();
-	render();
-
+        sL.load();
+    });
 }
+
+
+// return new Promise((resolve, reject) => {
+//     sL.onLoaded(function() {
+//         material = new THREE.ShaderMaterial({
+//             // ... existing shader material setup ...
+//         });
+//         const pointCloudData = loadPC();
+//         resolve(pointCloudData);
+//     });
+
+//     sL.load();
+// });
+
 
 // Any other functions or logic needed for the module
 

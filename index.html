@@ -80,25 +80,6 @@
         <div id="titlePage-box" class="parallax-box">
             <!-- <img src="assets/demeterdepth.png"> -->
         </div>
-        <div id="empathy-box" class="parallax-box">
-            <!-- <img src="assets/demeterdepth.png"> -->
-        </div>
-        <div id="blending-box" class="parallax-box">
-            <!-- <img src="assets/demeterdepth.png"> -->
-        </div>
-        <div id="context-box" class="parallax-box">
-            <!-- <img src="assets/demeterdepth.png"> -->
-        </div>
-        <div id="style-box" class="parallax-box">
-            <!-- <img src="assets/demeterdepth.png"> -->
-        </div>
-        <div id="decomposition-box" class="parallax-box">
-            <!-- <img src="assets/demeterdepth.png"> -->
-        </div>
-        <div id="analogy-box" class="parallax-box">
-            <!-- <img src="assets/demeterdepth.png"> -->
-        </div>
-        
         
         
         <div id="empathy" class="section">
@@ -534,21 +515,17 @@
                 
     </div>
 
-    <script type="module">
+   <script type="module">
 
         import { initializePointCloud } from './js/pcloader_modular.js';
 
-            
-            // Initialize point clouds for each div
-
-        // initializePointCloud('home-box', 'titlePage', 'assets/trashimage.png', 'assets/trashdepth.png');
-        // initializePointCloud('empathy-box', 'empathy', 'assets/empathy_luca.png', 'assets/empathy_luca_depth.png');
+        
         const sectionImages = {
             'titlePage': {
                 image: 'assets/empathy_moss.png',
                 depth: 'assets/empathy_moss_depth.png',
-                nMin: 35,
-                nMax: 60
+                nMin: 15,
+                nMax: 50
             },
             'empathy': {
                 image: 'assets/empathy_luca.png',
@@ -566,7 +543,7 @@
                 image: 'assets/context_athens_sq.png',
                 depth: 'assets/context_athens_sq_depth.png',
                 nMin: 35,
-                nMax: 60
+                nMax: 45
             },
             'decomposition': {
                 image: 'assets/decomposition_shop.png',
@@ -589,6 +566,41 @@
             // // Add more sections and images as needed
         };
 
+        var settings = {
+            focalDistance: 10,
+            near: 5,
+            far: 20,
+            smoothRadius: 0,
+            quadSize: 1.0,
+            pointSize: 2,
+            downsampling: 2
+        };
+        var nDistanceInit=60;
+        var nDistanceMax=60;
+        var nDistanceMin=35;
+        var material, meshPoint;
+        var renderer, scene, camera, fov = 70, nFov = fov, distance = 500;
+        var nDistance = nDistanceInit;
+        var displacement = 0, nDisplacement = displacement;
+
+        var lon = 90, lat = 0, nLon = lon, nLat = lat;
+        var oDist, oFov, adjustment = 0;
+
+        // Initialize renderers
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera( fov, window.innerWidth / window.innerHeight, .1, 1000 );
+        camera.target = new THREE.Vector3( 0, 0, 0 );
+        camera.position.y = 500;
+        scene.add( camera );
+
+        renderer = new THREE.WebGLRenderer( { antialias: true, alpha: false } );
+        renderer.setClearColor( 0, 0 );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.sortObjects = true;
+
+        document.getElementById("titlePage-box").appendChild(renderer.domElement);
+
         // initializePointCloud('titlePage-box', 'titlePage', 'assets/trashimage.png',  'assets/trashdepth.png')
 
         // // Initialize all point clouds
@@ -596,6 +608,100 @@
         //     const { image, depth } = sectionImages[sectionId];
         //     initializePointCloud(sectionId + '-box', sectionId, image, depth);
         // }
+
+        let pointClouds = {};
+        let currentPointCloud = null; // Declare the variable outside
+        let pointCloudData = {}; // To store additional parameters of each point cloud
+
+
+
+    async function initPointClouds() {
+    let loadedPointClouds = 0;
+    const totalPointClouds = Object.keys(sectionImages).length;
+
+    for (const sectionId in sectionImages) {
+        const { image, depth } = sectionImages[sectionId];
+        try {
+            const data = await initializePointCloud(sectionId + '-box', sectionId, image, depth, 500);
+            pointClouds[sectionId] = data.pointCloud;
+            pointCloudData[sectionId] = { minZ: data.minZ, maxZ: data.maxZ, offset: data.offset, adjustment: data.adjustment };
+            loadedPointClouds++;
+
+            if (loadedPointClouds === totalPointClouds) {
+                // Set the currentPointCloud to the 'titlePage' point cloud
+                currentPointCloud = pointClouds['titlePage'];
+                scene.add(currentPointCloud); // Add the point cloud to the scene
+
+                // Hide the loading screen
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    loadingScreen.style.visibility = 'hidden';
+                    loadingScreen.style.pointerEvents = 'none';
+                }
+            }
+        } catch (error) {
+            console.error('Error loading point cloud for', sectionId, error);
+        }
+
+        // Update loading screen text
+        document.getElementById('number').innerText = 'Loading ' + (loadedPointClouds - 1) + ' out of 6 projects';
+    }
+}
+        // Call the function to initialize point clouds
+        initPointClouds();
+
+
+
+
+        function render() {
+
+            requestAnimationFrame( render );
+
+            // if( nDistance < camera.near ) nDistance = camera.near;
+
+            lon += ( nLon - lon ) * .1;
+            lat += ( nLat - lat ) * .1;
+            fov += ( nFov - fov ) * .1; 
+            // distance += ( nDistance - distance ) * .1; 
+
+            if (nDistance > nDistanceMin) {
+                nDistance -= 0.05; // Decrement nDistance
+                nDistance = Math.max(nDistance, nDistanceMin)
+            }
+
+            distance += ( nDistance - distance ) * .1; 
+            displacement += ( nDisplacement - displacement ) * .1; 
+
+            camera.fov = fov;
+            camera.updateProjectionMatrix();
+
+            if( meshPoint ) {
+                meshPoint.scale.z = adjustment * displacement;
+                meshPoint.visible = 1;
+            }
+
+            lat = Math.max( - 85, Math.min( 85, lat ) );
+            var phi = ( 90 - lat ) * Math.PI / 180;
+            var theta = lon * Math.PI / 180;
+
+            camera.position.x = distance * Math.sin( phi ) * Math.cos( theta );
+            camera.position.y = distance * Math.cos( phi );
+            camera.position.z = distance * Math.sin( phi ) * Math.sin( theta );
+
+            camera.lookAt( camera.target );
+
+            renderer.render( scene, camera );
+
+            }
+
+
+
+
+
+
+
+        
 
         const navCircles = document.querySelectorAll('.nav-circle');
 
@@ -637,14 +743,7 @@
                 }
             };
 
-    // Initialize all point clouds
-    for (const sectionId in sectionImages) {
-        const { image, depth, nMin, nMax } = sectionImages[sectionId];
-        initializePointCloud(sectionId + '-box', sectionId, image, depth, onPointCloudLoaded, nMin, nMax, 500);
-    }
-
-
-            handleSectionVisibility('titlePage', true); // Assuming 'titlePage' is the ID
+            // handleSectionVisibility('titlePage', true); // Assuming 'titlePage' is the ID
 
             const navCircles = document.querySelectorAll('.nav-circle');
             navCircles.forEach(circle => {
@@ -670,38 +769,94 @@
 
             });
 
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+
     
     // Function to update the visibility of the navbar circles
-    function updateNavCircleVisibility(sectionId, isVisible) {
-        navCircles.forEach(circle => {
-            if (circle.getAttribute('data-target') === sectionId) {
-                circle.style.opacity = isVisible ? 1 : 0.5; // Adjust opacity values as needed
-            }
-        });
+function updateNavCircleVisibility(sectionId, isVisible) {
+    navCircles.forEach(circle => {
+        if (circle.getAttribute('data-target') === sectionId) {
+            circle.style.opacity = isVisible ? 1 : 0.5; // Adjust opacity values as needed
+        }
+    });
+}
+document.getElementById("titlePage").style.opacity = "1";
+
+function switchPointCloud(sectionId) {
+    if (currentPointCloud) {
+        scene.remove(currentPointCloud); // Remove the current point cloud from the scene
     }
-
-    function handleSectionVisibility(sectionId, isIntersecting) {
-    const boxId = sectionId + '-box';
-    const activeBox = document.getElementById(boxId);
-
-    if (activeBox) {
-        activeBox.style.opacity = isIntersecting ? '1' : '0';
+    
+    const newPointCloud = pointClouds[sectionId];
+    if (newPointCloud) {
+        currentPointCloud = newPointCloud;
+        scene.add(currentPointCloud); // Add the new point cloud to the scene
     }
-
-    // Update navbar circle visibility
-    updateNavCircleVisibility('#' + sectionId, isIntersecting);
-
-    // Call initializePointCloud if needed
-    // ... additional logic, if any ...
 }
 
-    // Intersection Observer to detect when sections are in view
-    let observer = new IntersectionObserver((entries) => {
+
+let currentSectionId = 'titlePage'; // Initialize to the default section
+
+    let animating = false;
+	let isIntersecting = false; // Track the intersection status
+
+let currentIntersectingSection = "TitlePage";
+
+
+let animatingSectionId = "TitlePage";
+
+let observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-        handleSectionVisibility(entry.target.id, entry.isIntersecting);
+        const sectionId = entry.target.id;
+        isIntersecting = entry.isIntersecting;
+
+        if (isIntersecting && currentIntersectingSection !== sectionId) {
+            currentIntersectingSection = sectionId; // Update the currently intersecting section
+            console.log('New intersecting section:', currentIntersectingSection);
+
+            // Start fade-out effect
+            renderer.domElement.style.transition = 'opacity 0.7s';
+            renderer.domElement.style.opacity = '0';
+
+
+            // Wait for fade-out to complete
+            setTimeout(() => {
+                // Handle point cloud swapping
+                if (currentPointCloud) {
+                    scene.remove(currentPointCloud); // Remove current point cloud from the scene
+                }
+
+                const {minZ, maxZ, offset, adjustment} = pointCloudData[sectionId]
+
+
+                nDistance = parseFloat( settings.focalDistance ) + offset * adjustment;
+				nFov = 1 * Math.atan2( .5 * adjustment * settings.near, settings.focalDistance ) * 180 / Math.PI;
+				// material.uniforms.size.value = settings.pointSize * nDistance;
+				nDisplacement = 1;
+
+				camera.near = .001;
+				camera.far = ( settings.far + ( maxZ - minZ ) ) * adjustment;
+				camera.updateProjectionMatrix();
+
+				nLat = 0;
+				nLon = 90;
+                currentPointCloud = pointClouds[currentIntersectingSection]; // Update the current point cloud
+                scene.add(currentPointCloud); // Add the new point cloud to the scene
+
+            }, 500); // This timeout duration should match the fade-out transition time
+            setTimeout(() => {
+                renderer.domElement.style.opacity = '1';
+            }, 1000);
+
+
+        }
+        updateNavCircleVisibility(sectionId, isIntersecting);
     });
 }, { threshold: 0.1 });
-
 
     // Observe each section
     document.querySelectorAll('.section').forEach(section => {
@@ -709,7 +864,11 @@
     });
 
 
-    </script>
+    render();
+    
+
+
+    </script> 
 
     
 </body>
