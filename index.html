@@ -615,53 +615,67 @@
 
 
 
-    async function initPointClouds() {
+        async function initPointClouds() {
     let loadedPointClouds = 0;
     const totalPointClouds = Object.keys(sectionImages).length;
 
     for (const sectionId in sectionImages) {
         const { image, depth } = sectionImages[sectionId];
 
-        var imgSrc = new Image();
-        var img = new Image();
+        // Create a promise to load both images
+        const loadImages = new Promise((resolve, reject) => {
+            var imgSrc = new Image();
+            var img = new Image();
+            let imagesLoaded = 0;
 
-        // Set the source paths
-        img.src = depth;
-        imgSrc.src = image;
-        img.onload = function() {
+            // Set the source paths
+            img.src = depth;
+            imgSrc.src = image;
 
-		    imgSrc.onload = function() {
-                try {
-                    const data = await initializePointCloud(sectionId + '-box', sectionId, imgSrc, img, 500);
-                    pointClouds[sectionId] = data.pointCloud;
-                    pointCloudData[sectionId] = { minZ: data.minZ, maxZ: data.maxZ, offset: data.offset, adjustment: data.adjustment };
-                    loadedPointClouds++;
+            // Event listeners for when images load
+            img.onload = imgSrc.onload = () => {
+                imagesLoaded++;
+                if (imagesLoaded === 2) {
+                    resolve({ imgSrc, img });
+                }
+            };
 
-                    if (loadedPointClouds === totalPointClouds) {
-                        // Set the currentPointCloud to the 'titlePage' point cloud
-                        currentPointCloud = pointClouds['titlePage'];
-                        scene.add(currentPointCloud); // Add the point cloud to the scene
+            // Error handling
+            img.onerror = imgSrc.onerror = () => reject('Image load error');
+        });
 
-                        // Hide the loading screen
-                        const loadingScreen = document.getElementById('loadingScreen');
-                        if (loadingScreen) {
-                            loadingScreen.style.opacity = '0';
-                            loadingScreen.style.visibility = 'hidden';
-                            loadingScreen.style.pointerEvents = 'none';
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error loading point cloud for', sectionId, error);
+        try {
+            // Wait for images to load
+            const { imgSrc, img } = await loadImages;
+
+            // Call initializePointCloud
+            const data = await initializePointCloud(sectionId + '-box', sectionId, imgSrc, img, 500);
+            pointClouds[sectionId] = data.pointCloud;
+            pointCloudData[sectionId] = { minZ: data.minZ, maxZ: data.maxZ, offset: data.offset, adjustment: data.adjustment };
+            loadedPointClouds++;
+
+            if (loadedPointClouds === totalPointClouds) {
+                // Set the currentPointCloud to the 'titlePage' point cloud
+                currentPointCloud = pointClouds['titlePage'];
+                scene.add(currentPointCloud); // Add the point cloud to the scene
+
+                // Hide the loading screen
+                const loadingScreen = document.getElementById('loadingScreen');
+                if (loadingScreen) {
+                    loadingScreen.style.opacity = '0';
+                    loadingScreen.style.visibility = 'hidden';
+                    loadingScreen.style.pointerEvents = 'none';
                 }
             }
+        } catch (error) {
+            console.error('Error loading point cloud for', sectionId, ':', error);
         }
 
         // Update loading screen text
         document.getElementById('number').innerText = 'Loading ' + (loadedPointClouds - 1) + ' out of 6 projects';
     }
 }
-        // Call the function to initialize point clouds
-        initPointClouds();
+initPointClouds();
 
 
 
