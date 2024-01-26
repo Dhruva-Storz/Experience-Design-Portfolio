@@ -805,7 +805,7 @@ initPointClouds();
     // Function to update the visibility of the navbar circles
 function updateNavCircleVisibility(sectionId, isVisible) {
     navCircles.forEach(circle => {
-        if (circle.getAttribute('data-target') === sectionId) {
+        if (circle.getAttribute('data-target') === ('#' + sectionId)) {
             circle.style.opacity = isVisible ? 1 : 0.5; // Adjust opacity values as needed
         }
     });
@@ -845,7 +845,7 @@ let observer = new IntersectionObserver((entries) => {
             console.log('New intersecting section:', currentIntersectingSection);
 
             // Start fade-out effect
-            renderer.domElement.style.transition = 'opacity 0.7s';
+            renderer.domElement.style.transition = 'opacity 0.5s';
             renderer.domElement.style.opacity = '0';
 
 
@@ -873,10 +873,10 @@ let observer = new IntersectionObserver((entries) => {
                 currentPointCloud = pointClouds[currentIntersectingSection]; // Update the current point cloud
                 scene.add(currentPointCloud); // Add the new point cloud to the scene
 
-            }, 500); // This timeout duration should match the fade-out transition time
+            }, 300); // This timeout duration should match the fade-out transition time
             setTimeout(() => {
                 renderer.domElement.style.opacity = '1';
-            }, 700);
+            }, 800);
 
 
         }
