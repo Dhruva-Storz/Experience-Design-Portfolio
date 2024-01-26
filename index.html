@@ -15,7 +15,8 @@
 
         <div id="loadingScreen">
             <!-- Loading screen content (could be a spinner, logo, etc.) -->
-            <p>Loading...</p>
+            <!-- <p>Loading...</p> -->
+            <p id="number"></p>
         </div>
 
         <div id="imageOverlay" style="display: none;">
@@ -621,13 +622,14 @@
 
             let loadedPointClouds = 0;
             const totalPointClouds = Object.keys(sectionImages).length;
-
             const onPointCloudLoaded = () => {
                 loadedPointClouds++;
+                document.getElementById('number').innerText = 'Loading ' + (loadedPointClouds - 1) + ' out of 6 projects';
+
                 if (loadedPointClouds === totalPointClouds) {
                     // All point clouds loaded, hide the loading screen
-                    const loadingScreen = document.getElementById('loadingScreen');
                     if (loadingScreen) {
+                        const loadingScreen = document.getElementById('loadingScreen');
                         loadingScreen.style.opacity = '0';
                         loadingScreen.style.visibility = 'hidden';
                         loadingScreen.style.pointerEvents = 'none';
