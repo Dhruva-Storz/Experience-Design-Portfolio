@@ -628,28 +628,32 @@
         // Set the source paths
         img.src = depth;
         imgSrc.src = image;
+        img.onload = function() {
 
-        try {
-            const data = await initializePointCloud(sectionId + '-box', sectionId, imgSrc, img, 500);
-            pointClouds[sectionId] = data.pointCloud;
-            pointCloudData[sectionId] = { minZ: data.minZ, maxZ: data.maxZ, offset: data.offset, adjustment: data.adjustment };
-            loadedPointClouds++;
+		    imgSrc.onload = function() {
+                try {
+                    const data = await initializePointCloud(sectionId + '-box', sectionId, imgSrc, img, 500);
+                    pointClouds[sectionId] = data.pointCloud;
+                    pointCloudData[sectionId] = { minZ: data.minZ, maxZ: data.maxZ, offset: data.offset, adjustment: data.adjustment };
+                    loadedPointClouds++;
 
-            if (loadedPointClouds === totalPointClouds) {
-                // Set the currentPointCloud to the 'titlePage' point cloud
-                currentPointCloud = pointClouds['titlePage'];
-                scene.add(currentPointCloud); // Add the point cloud to the scene
+                    if (loadedPointClouds === totalPointClouds) {
+                        // Set the currentPointCloud to the 'titlePage' point cloud
+                        currentPointCloud = pointClouds['titlePage'];
+                        scene.add(currentPointCloud); // Add the point cloud to the scene
 
-                // Hide the loading screen
-                const loadingScreen = document.getElementById('loadingScreen');
-                if (loadingScreen) {
-                    loadingScreen.style.opacity = '0';
-                    loadingScreen.style.visibility = 'hidden';
-                    loadingScreen.style.pointerEvents = 'none';
+                        // Hide the loading screen
+                        const loadingScreen = document.getElementById('loadingScreen');
+                        if (loadingScreen) {
+                            loadingScreen.style.opacity = '0';
+                            loadingScreen.style.visibility = 'hidden';
+                            loadingScreen.style.pointerEvents = 'none';
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error loading point cloud for', sectionId, error);
                 }
             }
-        } catch (error) {
-            console.error('Error loading point cloud for', sectionId, error);
         }
 
         // Update loading screen text
